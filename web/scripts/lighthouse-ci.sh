@@ -36,7 +36,6 @@ lighthouse \
 	--chrome-flags='--user-agent="MobifyPreview" --allow-insecure-localhost' \
 	--output=html \
 	--output-path=${OUTPUT_PATH} \
-	--disable-device-emulation=true \
 	"${URL}${PREVIEW}"
 
 node ./lighthouse/check-score.js

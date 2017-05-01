@@ -12,7 +12,7 @@ import Icon from 'progressive-web-sdk/dist/components/icon'
 import {Ledger, LedgerRow} from 'progressive-web-sdk/dist/components/ledger'
 import {Accordion, AccordionItem} from 'progressive-web-sdk/dist/components/accordion'
 
-const CartSummary = ({summaryCount, subtotalExclTax, subtotalInclTax, shippingRate, shippingLabel, zipCode, taxAmount, onCalculateClick}) => {
+const CartSummary = ({summaryCount, subtotalExclTax, subtotalInclTax, subtotalWithDiscount, couponCode, shippingRate, shippingLabel, zipCode, taxAmount, discountAmount, onCalculateClick}) => {
     const calculateButton = (
         <Button innerClassName="u-padding-end-0 u-color-brand u-text-letter-spacing-normal" onClick={onCalculateClick}>
             Calculate <Icon name="chevron-right" />
@@ -46,6 +46,13 @@ const CartSummary = ({summaryCount, subtotalExclTax, subtotalInclTax, shippingRa
                         label={`Subtotal (${summaryCount} items)`}
                         value={subtotalExclTax}
                     />
+                    {discountAmount &&
+                        <LedgerRow
+                            className="pw--sale"
+                            label={`Discount: ${couponCode}`}
+                            value={discountAmount}
+                        />
+                    }
 
                     {/* <LedgerRow
                         label="Discount: FREESHIP"
@@ -76,11 +83,21 @@ const CartSummary = ({summaryCount, subtotalExclTax, subtotalInclTax, shippingRa
                     ]
                     }
 
-                    <LedgerRow
-                        label="Total"
-                        isTotal={true}
-                        value={subtotalInclTax}
-                    />
+                    {discountAmount ?
+                        <LedgerRow
+                            label="Total"
+                            isTotal={true}
+                            value={subtotalWithDiscount}
+                        />
+                    :
+                        <LedgerRow
+                            label="Total"
+                            isTotal={true}
+                            value={subtotalInclTax}
+                        />
+                    }
+
+
                 </Ledger>
 
                 <div className="u-padding-end-md u-padding-bottom-lg u-padding-start-md">
@@ -98,10 +115,13 @@ const CartSummary = ({summaryCount, subtotalExclTax, subtotalInclTax, shippingRa
 
 
 CartSummary.propTypes = {
+    couponCode: PropTypes.string,
+    discountAmount: PropTypes.string,
     shippingLabel: PropTypes.string,
     shippingRate: PropTypes.string,
     subtotalExclTax: PropTypes.string,
     subtotalInclTax: PropTypes.string,
+    subtotalWithDiscount: PropTypes.string,
     summaryCount: PropTypes.number,
     taxAmount: PropTypes.string,
     zipCode: PropTypes.string,
@@ -109,11 +129,14 @@ CartSummary.propTypes = {
 }
 
 const mapStateToProps = createPropsSelector({
+    discountAmount: cartSelectors.getDiscountAmount,
+    couponCode: cartSelectors.getCouponCode,
     shippingRate: getSelectedShippingRate,
     shippingLabel: getSelectedShippingLabel,
     zipCode: getPostcode,
     subtotalExclTax: cartSelectors.getSubtotalExcludingTax,
     subtotalInclTax: cartSelectors.getSubtotalIncludingTax,
+    subtotalWithDiscount: cartSelectors.getSubtotalWithDiscount,
     taxAmount: cartSelectors.getTaxAmount,
     summaryCount: cartSelectors.getCartSummaryCount,
 })

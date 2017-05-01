@@ -3,7 +3,7 @@ import {createAction, urlToPathKey, parseLocationData} from '../../utils/utils'
 import {closeModal, openModal} from '../../store/modals/actions'
 import {fetchShippingMethodsEstimate} from '../../store/checkout/shipping/actions'
 import {getSelectedShippingMethod} from '../../store/checkout/shipping/selectors'
-import {getFormValues, getFormRegisteredFields} from '../../store/form/selectors'
+import {getFormValues, getFormRegisteredFields, getCouponValue} from '../../store/form/selectors'
 import {receiveCartContents, removeFromCart} from '../../store/cart/actions'
 import {
     CART_ESTIMATE_SHIPPING_MODAL,
@@ -17,7 +17,6 @@ import {getUenc} from '../product-details/selectors'
 import {addNotification} from '../app/actions'
 import {getFormKey, getIsLoggedIn} from '../app/selectors'
 import {getCustomerEntityID} from '../../store/checkout/selectors'
-
 
 export const receiveData = createAction('Receive Cart Data')
 export const setRemoveItemId = createAction('Set item id for removal', 'removeItemId')
@@ -129,4 +128,64 @@ export const openRemoveItemModal = (itemId) => {
         dispatch(openModal(CART_REMOVE_ITEM_MODAL))
         dispatch(setRemoveItemId(itemId))
     }
+}
+export const getTotalsInfo = () => (dispatch, getState) => {
+    const currentState = getState()
+    const entityID = getCustomerEntityID(currentState)
+    const isLoggedIn = getIsLoggedIn(currentState)
+    const getPromoUrl = `/rest/default/V1/${isLoggedIn ? 'carts/mine' : `guest-carts/${entityID}`}/totals-information`
+    const requestData = {
+        addressInformation: {
+            address: {}
+        }
+    }
+
+    const PromoErrorNotification = {
+        content: 'Unable to get totals Info',
+        id: 'totalsError',
+        showRemoveButton: true
+    }
+
+    return makeJsonEncodedRequest(getPromoUrl, requestData, {method: 'POST'})
+        .then((response) => response.json())
+        .then((responseJSON) => {
+            const totalsInfo = {
+                subtotal_with_discount: `$${responseJSON.subtotal_with_discount.toFixed(2)}`,
+                coupon_code: responseJSON.coupon_code,
+                discount_amount: `-$${responseJSON.discount_amount.toFixed(2).replace('-', '')}`
+            }
+            console.log('GET responseJSON', responseJSON)
+            dispatch(receiveCartContents(totalsInfo))
+        })
+
+        .catch(() => {
+            dispatch(addNotification(PromoErrorNotification))
+        })
+}
+
+export const submitPromoCode = () => (dispatch, getState) => {
+    const currentState = getState()
+    const entityID = getCustomerEntityID(currentState)
+    const isLoggedIn = getIsLoggedIn(currentState)
+    const couponCode = getCouponValue(currentState)
+
+    const putPromoUrl = `/rest/default/V1/${isLoggedIn ? 'carts/mine' : `guest-carts/${entityID}`}/coupons/${couponCode}`
+    const requestData = {
+        coupon_code: 'coupon_code',
+        discount_amount: 'discount_amount'
+    }
+    const PromoErrorNotification = {
+        content: 'Unable to apply promo',
+        id: 'promoError',
+        showRemoveButton: true
+    }
+
+    return makeJsonEncodedRequest(putPromoUrl, requestData, {method: 'PUT'})
+        .then((response) => response.json())
+        .then(() => {
+            dispatch(getTotalsInfo())
+        })
+        .catch(() => {
+            dispatch(addNotification(PromoErrorNotification))
+        })
 }

@@ -117,8 +117,6 @@ const mapStateToProps = createPropsSelector({
 const mapDispatchToProps = {
     closeModal: () => closeModal(CART_ESTIMATE_SHIPPING_MODAL),
     submitEstimateShipping
-
-
 }
 
 const EstimateShippingReduxForm = ReduxForm.reduxForm({

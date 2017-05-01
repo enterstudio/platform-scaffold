@@ -129,6 +129,7 @@ export const openRemoveItemModal = (itemId) => {
         dispatch(setRemoveItemId(itemId))
     }
 }
+
 export const getTotalsInfo = () => (dispatch, getState) => {
     const currentState = getState()
     const entityID = getCustomerEntityID(currentState)
@@ -140,7 +141,7 @@ export const getTotalsInfo = () => (dispatch, getState) => {
         }
     }
 
-    const PromoErrorNotification = {
+    const TotalErrorNotification = {
         content: 'Unable to get totals Info',
         id: 'totalsError',
         showRemoveButton: true
@@ -154,12 +155,11 @@ export const getTotalsInfo = () => (dispatch, getState) => {
                 coupon_code: responseJSON.coupon_code,
                 discount_amount: `-$${responseJSON.discount_amount.toFixed(2).replace('-', '')}`
             }
-            console.log('GET responseJSON', responseJSON)
             dispatch(receiveCartContents(totalsInfo))
         })
 
         .catch(() => {
-            dispatch(addNotification(PromoErrorNotification))
+            dispatch(addNotification(TotalErrorNotification))
         })
 }
 
@@ -188,4 +188,8 @@ export const submitPromoCode = () => (dispatch, getState) => {
         .catch(() => {
             dispatch(addNotification(PromoErrorNotification))
         })
+}
+
+export const removePromoCode = () => {
+    console.log('removed promo')
 }

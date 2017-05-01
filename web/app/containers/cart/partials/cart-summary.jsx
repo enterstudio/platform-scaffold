@@ -4,6 +4,7 @@ import {createPropsSelector} from 'reselect-immutable-helpers'
 import * as cartSelectors from '../../../store/cart/selectors'
 import {CART_ESTIMATE_SHIPPING_MODAL} from '../constants'
 import {openModal} from '../../../store/modals/actions'
+import {removePromoCode} from '../actions'
 import {getSelectedShippingRate, getSelectedShippingLabel, getPostcode} from '../../../store/checkout/shipping/selectors'
 
 import Button from 'progressive-web-sdk/dist/components/button'
@@ -12,7 +13,20 @@ import Icon from 'progressive-web-sdk/dist/components/icon'
 import {Ledger, LedgerRow} from 'progressive-web-sdk/dist/components/ledger'
 import {Accordion, AccordionItem} from 'progressive-web-sdk/dist/components/accordion'
 
-const CartSummary = ({summaryCount, subtotalExclTax, subtotalInclTax, subtotalWithDiscount, couponCode, shippingRate, shippingLabel, zipCode, taxAmount, discountAmount, onCalculateClick}) => {
+const CartSummary = ({
+    summaryCount,
+    subtotalExclTax,
+    subtotalInclTax,
+    subtotalWithDiscount,
+    couponCode,
+    shippingRate,
+    shippingLabel,
+    zipCode,
+    taxAmount,
+    discountAmount,
+    onCalculateClick,
+    removePromoCode
+}) => {
     const calculateButton = (
         <Button innerClassName="u-padding-end-0 u-color-brand u-text-letter-spacing-normal" onClick={onCalculateClick}>
             Calculate <Icon name="chevron-right" />
@@ -25,6 +39,12 @@ const CartSummary = ({summaryCount, subtotalExclTax, subtotalInclTax, subtotalWi
                 {zipCode}
             </Button>
         </span>
+    )
+
+    const removeButton = (
+        <Button innerClassName="u-color-brand u-padding-start-0 u-text-letter-spacing-normal" onClick={removePromoCode}>
+            Remove Discount
+        </Button>
     )
 
     return (
@@ -50,6 +70,7 @@ const CartSummary = ({summaryCount, subtotalExclTax, subtotalInclTax, subtotalWi
                         <LedgerRow
                             className="pw--sale"
                             label={`Discount: ${couponCode}`}
+                            labelAction={removeButton}
                             value={discountAmount}
                         />
                     }
@@ -117,6 +138,7 @@ const CartSummary = ({summaryCount, subtotalExclTax, subtotalInclTax, subtotalWi
 CartSummary.propTypes = {
     couponCode: PropTypes.string,
     discountAmount: PropTypes.string,
+    removePromoCode: PropTypes.func,
     shippingLabel: PropTypes.string,
     shippingRate: PropTypes.string,
     subtotalExclTax: PropTypes.string,
@@ -142,7 +164,8 @@ const mapStateToProps = createPropsSelector({
 })
 
 const mapDispatchToProps = {
-    onCalculateClick: () => openModal(CART_ESTIMATE_SHIPPING_MODAL)
+    onCalculateClick: () => openModal(CART_ESTIMATE_SHIPPING_MODAL),
+    removePromoCode
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(CartSummary)

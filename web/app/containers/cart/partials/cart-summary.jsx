@@ -49,12 +49,21 @@ const CartSummary = ({
     )
 
     const totals = function() {
-        if (discountAmount) {
+        if (discountAmount && !taxAmount) {
             return (
                 <LedgerRow
                     label="Total"
                     isTotal={true}
                     value={subtotalWithDiscount}
+                />
+            )
+        }
+        if (taxAmount && !discountAmount) {
+            return (
+                <LedgerRow
+                    label="Total"
+                    isTotal={true}
+                    value={subtotalInclTax}
                 />
             )
         }
@@ -169,7 +178,7 @@ CartSummary.propTypes = {
 const mapStateToProps = createPropsSelector({
     discountAmount: cartSelectors.getDiscountAmount,
     couponCode: cartSelectors.getCouponCode,
-    grandTotal: cartSelectors.getGroundTotal,
+    grandTotal: cartSelectors.getGrandTotal,
     shippingRate: getSelectedShippingRate,
     shippingLabel: getSelectedShippingLabel,
     zipCode: getPostcode,

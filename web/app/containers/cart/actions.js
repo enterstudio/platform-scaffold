@@ -59,6 +59,7 @@ export const fetchTaxEstimate = () => (dispatch, getState) => {
                 subtotal: `$${responseJSON.subtotal.toFixed(2)}`,
                 subtotal_incl_tax: `$${responseJSON.subtotal_incl_tax.toFixed(2)}`,
                 tax_amount: `$${responseJSON.tax_amount.toFixed(2)}`,
+                base_grand_total: `$${responseJSON.base_grand_total.toFixed(2)}`
             }
             dispatch(receiveCartContents(cartTotals))
         })
@@ -155,7 +156,8 @@ export const submitPromoCode = () => (dispatch, getState) => {
             const totalsInfo = {
                 subtotal_with_discount: `$${responseJSON.subtotal_with_discount.toFixed(2)}`,
                 coupon_code: responseJSON.coupon_code,
-                discount_amount: `-$${responseJSON.discount_amount.toFixed(2).replace('-', '')}`
+                discount_amount: `-$${responseJSON.discount_amount.toFixed(2).replace('-', '')}`,
+                base_grand_total: `$${responseJSON.base_grand_total.toFixed(2)}`
             }
             dispatch(receiveCartContents(totalsInfo))
         })

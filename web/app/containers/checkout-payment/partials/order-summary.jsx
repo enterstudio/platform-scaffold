@@ -3,6 +3,9 @@ import {connect} from 'react-redux'
 import {createPropsSelector} from 'reselect-immutable-helpers'
 import {getAssetUrl} from 'progressive-web-sdk/dist/asset-utils'
 import throttle from 'lodash.throttle'
+import {removePromoCode} from '../../cart/actions'
+import CartPromoForm from '../../cart/partials/cart-promo-form'
+import CartSummary from '../../cart/partials/cart-summary'
 
 // Selectors
 import * as selectors from '../selectors'
@@ -18,8 +21,8 @@ import PaymentProductItem from './payment-product-item'
 // SDK Components
 import {Accordion, AccordionItem} from 'progressive-web-sdk/dist/components/accordion'
 import Button from 'progressive-web-sdk/dist/components/button'
-import Field from 'progressive-web-sdk/dist/components/field'
-import FieldRow from 'progressive-web-sdk/dist/components/field-row'
+// import Field from 'progressive-web-sdk/dist/components/field'
+// import FieldRow from 'progressive-web-sdk/dist/components/field-row'
 import Icon from 'progressive-web-sdk/dist/components/icon'
 import Image from 'progressive-web-sdk/dist/components/image'
 import {Ledger, LedgerRow} from 'progressive-web-sdk/dist/components/ledger'
@@ -56,20 +59,25 @@ class OrderSummary extends React.Component {
 
     render() {
         const {
-            // cart,
             cartItems,
+            couponCode,
+            discountAmount,
             isFixedPlaceOrderShown,
             summaryCount,
             subtotalExclTax,
             subtotalInclTax,
             shippingRate,
             shippingLabel,
-            taxAmount
+            taxAmount,
+            removePromoCode
         } = this.props
 
-        const cart = {
-        }
-
+        const removeButton = (
+            <Button innerClassName="u-color-brand u-padding-start-0 u-text-letter-spacing-normal" onClick={removePromoCode}>
+                Remove Discount
+            </Button>
+        )
+        console.log('CartSummary', CartSummary)
         return (
             <div className="t-checkout-payment__order-summary">
                 <div className="t-checkout-payment__title u-padding-top-lg u-padding-bottom-md">
@@ -102,34 +110,21 @@ class OrderSummary extends React.Component {
                             />
                         }
 
-                        {cart.shipping_rate &&
+                        {discountAmount && couponCode ?
                             <LedgerRow
-                                label={`Shipping (${cart.shipping_rate_label})`}
-                                value={cart.shipping_rate}
+                                className="pw--sale"
+                                label={`Discount: ${couponCode}`}
+                                labelAction={removeButton}
+                                value={discountAmount}
                             />
-                        }
-
-                        {cart.promo_rate &&
-                            <LedgerRow
-                                className="u-border-light-bottom"
-                                label={`Shipping (${cart.promo_rate_label})`}
-                                value={cart.promo_rate}
-                            />
+                        :
+                            <Accordion>
+                                <AccordionItem header="Promo code">
+                                    <CartPromoForm />
+                                </AccordionItem>
+                            </Accordion>
                         }
                     </Ledger>
-
-                    {!cart.promo_rate &&
-                        <Accordion>
-                            <AccordionItem header="Promo code">
-                                <FieldRow>
-                                    <Field label="Enter discount code">
-                                        <input type="text" placeholder="Enter discount code" />
-                                        <Button className="c--tertiary">Apply</Button>
-                                    </Field>
-                                </FieldRow>
-                            </AccordionItem>
-                        </Accordion>
-                    }
 
                     <Ledger className="u-margin-top-sm u-margin-bottom-sm">
                         <LedgerRow
@@ -181,16 +176,18 @@ class OrderSummary extends React.Component {
 
 OrderSummary.propTypes = {
     cart: PropTypes.object,
-
     /**
      * Cart item data
      */
     cartItems: PropTypes.array,
+    couponCode: PropTypes.string,
+    discountAmount: PropTypes.string,
 
     /**
      * Whether the fixed 'Place Order' container displays
      */
     isFixedPlaceOrderShown: PropTypes.bool,
+    removePromoCode: PropTypes.func,
 
     /**
      * Shipping rate label
@@ -230,6 +227,8 @@ OrderSummary.propTypes = {
 
 const mapStateToProps = createPropsSelector({
     cartItems: cartSelectors.getCartItems,
+    couponCode: cartSelectors.getCouponCode,
+    discountAmount: cartSelectors.getDiscountAmount,
     subtotalExclTax: cartSelectors.getSubtotalExcludingTax,
     subtotalInclTax: cartSelectors.getSubtotalIncludingTax,
     shippingRate: getSelectedShippingRate,
@@ -240,7 +239,8 @@ const mapStateToProps = createPropsSelector({
 })
 
 const mapDispatchToProps = {
-    toggleFixedPlaceOrder: checkoutPaymentActions.toggleFixedPlaceOrder
+    toggleFixedPlaceOrder: checkoutPaymentActions.toggleFixedPlaceOrder,
+    removePromoCode
 }
 
 export default connect(

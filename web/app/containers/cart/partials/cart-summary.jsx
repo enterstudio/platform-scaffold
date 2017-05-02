@@ -114,11 +114,6 @@ const CartSummary = ({
                         />
                     }
 
-                    {/* <LedgerRow
-                        label="Discount: FREESHIP"
-                        valueAction={<span className="u-color-accent">-$10.00</span>}
-                    />*/}
-
                     {!taxAmount ?
                         <LedgerRow
                             className="u-flex-none"

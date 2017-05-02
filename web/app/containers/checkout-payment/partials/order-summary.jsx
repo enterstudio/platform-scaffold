@@ -118,7 +118,7 @@ class OrderSummary extends React.Component {
                                 value={discountAmount}
                             />
                         :
-                            <Accordion>
+                            <Accordion className="u-border-bottom-0">
                                 <AccordionItem header="Promo code">
                                     <CartPromoForm />
                                 </AccordionItem>

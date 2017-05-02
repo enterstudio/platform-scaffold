@@ -105,7 +105,7 @@ const CartSummary = ({
                         label={`Subtotal (${summaryCount} items)`}
                         value={subtotalExclTax}
                     />
-                    {discountAmount &&
+                    {discountAmount && couponCode &&
                         <LedgerRow
                             className="pw--sale"
                             label={`Discount: ${couponCode}`}

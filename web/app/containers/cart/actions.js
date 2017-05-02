@@ -166,6 +166,30 @@ export const submitPromoCode = () => (dispatch, getState) => {
         })
 }
 
-export const removePromoCode = () => {
-    console.log('removed promo')
+export const removePromoCode = () => (dispatch, getState) => {
+    const RemovePromoErrorNotification = {
+        content: 'Unable to remove promo',
+        id: 'promoError',
+        showRemoveButton: true
+    }
+
+    const currentState = getState()
+    const isLoggedIn = getIsLoggedIn(currentState)
+    const entityID = getCustomerEntityID(currentState)
+    const putPromoUrl = `/rest/default/V1/${isLoggedIn ? 'carts/mine' : `guest-carts/${entityID}`}/coupons/`
+    return makeJsonEncodedRequest(putPromoUrl, {}, {method: 'DELETE'})
+        .then((response) => response.json())
+        .then(() => getCartTotalsInfo(getState))
+        .then((responseJSON) => {
+            const totalsInfo = {
+                tax_amount: `$${responseJSON.tax_amount.toFixed(2)}`,
+                subtotal_with_discount: `$${responseJSON.subtotal_with_discount.toFixed(2)}`,
+                coupon_code: responseJSON.coupon_code,
+                base_grand_total: `$${responseJSON.base_grand_total.toFixed(2)}`
+            }
+            dispatch(receiveCartContents(totalsInfo))
+        })
+        .catch(() => {
+            dispatch(addNotification(RemovePromoErrorNotification))
+        })
 }

@@ -10,9 +10,7 @@ const store = {
     subscribe: () => {},
     dispatch: () => {},
     getState: () => ({
-        ui: {
-            cart: Immutable.fromJS({})
-        }
+        cart: Immutable.Map()
     })
 }
 
@@ -22,13 +20,12 @@ test('OrderTotal renders without errors', () => {
             <OrderTotal />
         </Provider>
         )
-    console.log(wrapper.debug())
     expect(wrapper.length).toBe(1)
 })
 
 /* eslint-disable newline-per-chained-call */
 test('includes the component class name with no className prop', () => {
-    const wrapper = shallow(
+    const wrapper = mount(
         <Provider store={store}>
             <OrderTotal />
         </Provider>

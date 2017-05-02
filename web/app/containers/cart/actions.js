@@ -182,7 +182,6 @@ export const removePromoCode = () => (dispatch, getState) => {
         .then(() => getCartTotalsInfo(getState))
         .then((responseJSON) => {
             const totalsInfo = {
-                tax_amount: `$${responseJSON.tax_amount.toFixed(2)}`,
                 subtotal_with_discount: `$${responseJSON.subtotal_with_discount.toFixed(2)}`,
                 coupon_code: responseJSON.coupon_code,
                 base_grand_total: `$${responseJSON.base_grand_total.toFixed(2)}`

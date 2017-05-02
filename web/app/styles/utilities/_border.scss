@@ -28,7 +28,9 @@
     @include border-end(true);
 }
 
-
+.u-border-bottom-0 {
+    border-bottom: 0 !important;
+}
 // Light Border (Width and Color)
 // ---
 

@@ -5,7 +5,7 @@ import {getAssetUrl} from 'progressive-web-sdk/dist/asset-utils'
 import throttle from 'lodash.throttle'
 import {removePromoCode} from '../../cart/actions'
 import CartPromoForm from '../../cart/partials/cart-promo-form'
-import CartSummary from '../../cart/partials/cart-summary'
+import OrderTotal from '../../../components/order-total'
 
 // Selectors
 import * as selectors from '../selectors'
@@ -77,7 +77,7 @@ class OrderSummary extends React.Component {
                 Remove Discount
             </Button>
         )
-        console.log('CartSummary', CartSummary)
+
         return (
             <div className="t-checkout-payment__order-summary">
                 <div className="t-checkout-payment__title u-padding-top-lg u-padding-bottom-md">
@@ -125,14 +125,7 @@ class OrderSummary extends React.Component {
                             </Accordion>
                         }
                     </Ledger>
-
-                    <Ledger className="u-margin-top-sm u-margin-bottom-sm">
-                        <LedgerRow
-                            label="Total"
-                            isTotal={true}
-                            value={subtotalInclTax}
-                        />
-                    </Ledger>
+                    <OrderTotal className="u-border-light-top" />
 
                     {/* This is the statically positioned "Place Your Order" container */}
                     <div className="u-padding-end-md u-padding-start-md">

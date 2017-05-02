@@ -7,6 +7,8 @@ import {openModal} from '../../../store/modals/actions'
 import {removePromoCode} from '../actions'
 import {getSelectedShippingRate, getSelectedShippingLabel, getPostcode} from '../../../store/checkout/shipping/selectors'
 
+import OrderTotal from '../../../components/order-total'
+
 import Button from 'progressive-web-sdk/dist/components/button'
 import CartPromoForm from './cart-promo-form'
 import Icon from 'progressive-web-sdk/dist/components/icon'
@@ -16,9 +18,6 @@ import {Accordion, AccordionItem} from 'progressive-web-sdk/dist/components/acco
 const CartSummary = ({
     summaryCount,
     subtotalExclTax,
-    grandTotal,
-    subtotalInclTax,
-    subtotalWithDiscount,
     couponCode,
     shippingRate,
     shippingLabel,
@@ -47,44 +46,6 @@ const CartSummary = ({
             Remove Discount
         </Button>
     )
-
-    const totals = function() {
-        if (discountAmount && !taxAmount) {
-            return (
-                <LedgerRow
-                    label="Total"
-                    isTotal={true}
-                    value={subtotalWithDiscount}
-                />
-            )
-        }
-        if (taxAmount && !discountAmount) {
-            return (
-                <LedgerRow
-                    label="Total"
-                    isTotal={true}
-                    value={subtotalInclTax}
-                />
-            )
-        }
-        if (taxAmount && discountAmount) {
-            return (
-                <LedgerRow
-                    label="Total"
-                    isTotal={true}
-                    value={grandTotal}
-                />
-            )
-        } else {
-            return (
-                <LedgerRow
-                    label="Total"
-                    isTotal={true}
-                    value={subtotalInclTax}
-                />
-            )
-        }
-    }
 
     return (
         <div className="t-cart__summary">
@@ -137,8 +98,8 @@ const CartSummary = ({
                         />
                     ]
                     }
-                    {totals()}
                 </Ledger>
+                <OrderTotal className="u-border-light-top" />
 
                 <div className="u-padding-end-md u-padding-bottom-lg u-padding-start-md">
                     <Button

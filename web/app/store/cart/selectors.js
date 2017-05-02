@@ -18,3 +18,4 @@ export const getSubtotalWithDiscount = createGetSelector(getCart, 'subtotal_with
 export const getTaxAmount = createGetSelector(getCart, 'tax_amount')
 export const getCouponCode = createGetSelector(getCart, 'coupon_code')
 export const getDiscountAmount = createGetSelector(getCart, 'discount_amount')
+export const getGroundTotal = createGetSelector(getCart, 'base_grand_total')

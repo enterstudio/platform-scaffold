@@ -23,17 +23,14 @@ export const setRemoveItemId = createAction('Set item id for removal', 'removeIt
 export const setIsWishlistComplete = createAction('Set wishlist add complete', 'isWishlistAddComplete')
 export const setTaxRequestInitiation = createAction('Initiate tax request', 'initiateTaxRequest')
 
-export const fetchTaxEstimate = () => (dispatch, getState) => {
+export const getCartTotalsInfo = (getState) => {
     const currentState = getState()
-    const isLoggedIn = getIsLoggedIn(currentState)
+
     const formValues = getFormValues(ESTIMATE_FORM_NAME)(currentState)
-    const entityID = getCustomerEntityID(currentState)
     const registeredFieldNames = getFormRegisteredFields(ESTIMATE_FORM_NAME)(currentState).map(({name}) => name)
-    const address = parseLocationData(formValues, registeredFieldNames)
-
-    const getTotalsURL = `/rest/default/V1/${isLoggedIn ? 'carts/mine' : `guest-carts/${entityID}`}/totals-information`
-    const shippingMethod = getSelectedShippingMethod(currentState).toJS().value.split('_')
-
+    const address = parseLocationData(formValues, registeredFieldNames) || {}
+    let shippingMethod = getSelectedShippingMethod(currentState).toJS().value || ''
+    shippingMethod = shippingMethod.length ? shippingMethod.split('_') : []
     const requestData = {
         addressInformation: {
             address,
@@ -41,13 +38,22 @@ export const fetchTaxEstimate = () => (dispatch, getState) => {
             shipping_method_code: shippingMethod[1]
         }
     }
+
+    const isLoggedIn = getIsLoggedIn(currentState)
+    const entityID = getCustomerEntityID(currentState)
+    const getTotalsURL = `/rest/default/V1/${isLoggedIn ? 'carts/mine' : `guest-carts/${entityID}`}/totals-information`
+    return makeJsonEncodedRequest(getTotalsURL, requestData, {method: 'POST'})
+        .then((response) => response.json())
+}
+
+export const fetchTaxEstimate = () => (dispatch, getState) => {
     const taxErrorNotification = {
         content: 'Unable to calculate tax.',
         id: 'taxError',
         showRemoveButton: true
     }
-    return makeJsonEncodedRequest(getTotalsURL, requestData, {method: 'POST'})
-        .then((response) => response.json())
+    const totalInfo = getCartTotalsInfo(getState)
+    totalInfo
         .then((responseJSON) => {
             const cartTotals = {
                 subtotal: `$${responseJSON.subtotal.toFixed(2)}`,
@@ -130,25 +136,21 @@ export const openRemoveItemModal = (itemId) => {
     }
 }
 
-export const getTotalsInfo = () => (dispatch, getState) => {
-    const currentState = getState()
-    const entityID = getCustomerEntityID(currentState)
-    const isLoggedIn = getIsLoggedIn(currentState)
-    const getPromoUrl = `/rest/default/V1/${isLoggedIn ? 'carts/mine' : `guest-carts/${entityID}`}/totals-information`
-    const requestData = {
-        addressInformation: {
-            address: {}
-        }
-    }
-
-    const TotalErrorNotification = {
-        content: 'Unable to get totals Info',
-        id: 'totalsError',
+export const submitPromoCode = () => (dispatch, getState) => {
+    const PromoErrorNotification = {
+        content: 'Unable to apply promo',
+        id: 'promoError',
         showRemoveButton: true
     }
 
-    return makeJsonEncodedRequest(getPromoUrl, requestData, {method: 'POST'})
+    const currentState = getState()
+    const isLoggedIn = getIsLoggedIn(currentState)
+    const entityID = getCustomerEntityID(currentState)
+    const couponCode = getCouponValue(currentState)
+    const putPromoUrl = `/rest/default/V1/${isLoggedIn ? 'carts/mine' : `guest-carts/${entityID}`}/coupons/${couponCode}`
+    return makeJsonEncodedRequest(putPromoUrl, {}, {method: 'PUT'})
         .then((response) => response.json())
+        .then(() => getCartTotalsInfo(getState))
         .then((responseJSON) => {
             const totalsInfo = {
                 subtotal_with_discount: `$${responseJSON.subtotal_with_discount.toFixed(2)}`,
@@ -156,34 +158,6 @@ export const getTotalsInfo = () => (dispatch, getState) => {
                 discount_amount: `-$${responseJSON.discount_amount.toFixed(2).replace('-', '')}`
             }
             dispatch(receiveCartContents(totalsInfo))
-        })
-
-        .catch(() => {
-            dispatch(addNotification(TotalErrorNotification))
-        })
-}
-
-export const submitPromoCode = () => (dispatch, getState) => {
-    const currentState = getState()
-    const entityID = getCustomerEntityID(currentState)
-    const isLoggedIn = getIsLoggedIn(currentState)
-    const couponCode = getCouponValue(currentState)
-
-    const putPromoUrl = `/rest/default/V1/${isLoggedIn ? 'carts/mine' : `guest-carts/${entityID}`}/coupons/${couponCode}`
-    const requestData = {
-        coupon_code: 'coupon_code',
-        discount_amount: 'discount_amount'
-    }
-    const PromoErrorNotification = {
-        content: 'Unable to apply promo',
-        id: 'promoError',
-        showRemoveButton: true
-    }
-
-    return makeJsonEncodedRequest(putPromoUrl, requestData, {method: 'PUT'})
-        .then((response) => response.json())
-        .then(() => {
-            dispatch(getTotalsInfo())
         })
         .catch(() => {
             dispatch(addNotification(PromoErrorNotification))

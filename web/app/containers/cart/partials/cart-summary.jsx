@@ -16,6 +16,7 @@ import {Accordion, AccordionItem} from 'progressive-web-sdk/dist/components/acco
 const CartSummary = ({
     summaryCount,
     subtotalExclTax,
+    grandTotal,
     subtotalInclTax,
     subtotalWithDiscount,
     couponCode,
@@ -46,6 +47,35 @@ const CartSummary = ({
             Remove Discount
         </Button>
     )
+
+    const totals = function() {
+        if (discountAmount) {
+            return (
+                <LedgerRow
+                    label="Total"
+                    isTotal={true}
+                    value={subtotalWithDiscount}
+                />
+            )
+        }
+        if (taxAmount && discountAmount) {
+            return (
+                <LedgerRow
+                    label="Total"
+                    isTotal={true}
+                    value={grandTotal}
+                />
+            )
+        } else {
+            return (
+                <LedgerRow
+                    label="Total"
+                    isTotal={true}
+                    value={subtotalInclTax}
+                />
+            )
+        }
+    }
 
     return (
         <div className="t-cart__summary">
@@ -103,22 +133,7 @@ const CartSummary = ({
                         />
                     ]
                     }
-
-                    {discountAmount ?
-                        <LedgerRow
-                            label="Total"
-                            isTotal={true}
-                            value={subtotalWithDiscount}
-                        />
-                    :
-                        <LedgerRow
-                            label="Total"
-                            isTotal={true}
-                            value={subtotalInclTax}
-                        />
-                    }
-
-
+                    {totals()}
                 </Ledger>
 
                 <div className="u-padding-end-md u-padding-bottom-lg u-padding-start-md">
@@ -138,6 +153,7 @@ const CartSummary = ({
 CartSummary.propTypes = {
     couponCode: PropTypes.string,
     discountAmount: PropTypes.string,
+    grandTotal: PropTypes.string,
     removePromoCode: PropTypes.func,
     shippingLabel: PropTypes.string,
     shippingRate: PropTypes.string,
@@ -153,6 +169,7 @@ CartSummary.propTypes = {
 const mapStateToProps = createPropsSelector({
     discountAmount: cartSelectors.getDiscountAmount,
     couponCode: cartSelectors.getCouponCode,
+    grandTotal: cartSelectors.getGroundTotal,
     shippingRate: getSelectedShippingRate,
     shippingLabel: getSelectedShippingLabel,
     zipCode: getPostcode,

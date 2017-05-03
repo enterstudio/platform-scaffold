@@ -47,6 +47,49 @@ const CartSummary = ({
         </Button>
     )
 
+    const showTax = () => {
+        const myReturn = []
+
+        // Will only display if tax is calculated via Shipping Estimation
+        if (shippingRate) {
+            myReturn.push(
+                <LedgerRow
+                    label={`Shipping (${shippingLabel})`}
+                    value={shippingRate}
+                    key={`Shipping (${shippingLabel})`}
+                />
+            )
+        }
+
+        // if shipping tax IS calculated BUT no coupon or both coupon and shipping is calculated
+        if ((shippingRate && !couponCode) || (shippingRate && couponCode)) {
+            myReturn.push(
+                <LedgerRow
+                    className="u-flex-none u-border-0"
+                    label="Taxes"
+                    value={taxAmount}
+                    labelAction={editButton}
+                    key="Taxes"
+                />
+            )
+        }
+
+        // Coupon calculated, but NOT shipping tax or Neither coupon nor shipping is calculated
+        if ((!shippingRate && couponCode) || (!shippingRate && !couponCode)) {
+            myReturn.push(
+                <LedgerRow
+                    className="u-flex-none"
+                    label="Taxes"
+                    labelAction="Rates based on shipping location"
+                    valueAction={calculateButton}
+                    key="taxWithCalculate"
+                />
+            )
+        }
+
+        return myReturn
+    }
+
     return (
         <div className="t-cart__summary">
             <Accordion className="u-margin-top u-bg-color-neutral-00">
@@ -75,29 +118,7 @@ const CartSummary = ({
                         />
                     }
 
-                    {!taxAmount ?
-                        <LedgerRow
-                            className="u-flex-none"
-                            label="Taxes"
-                            labelAction="Rates based on shipping location"
-                            valueAction={calculateButton}
-                        />
-                    :
-                    [
-                        <LedgerRow
-                            label={`Shipping (${shippingLabel})`}
-                            value={shippingRate}
-                            key={`Shipping (${shippingLabel})`}
-                        />,
-                        <LedgerRow
-                            className="u-flex-none u-border-0"
-                            label="Taxes"
-                            labelAction={editButton}
-                            value={taxAmount}
-                            key="Taxes"
-                        />
-                    ]
-                    }
+                    {showTax()}
                 </Ledger>
                 <OrderTotal className="u-border-light-top" />
 

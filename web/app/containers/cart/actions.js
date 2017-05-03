@@ -138,6 +138,13 @@ export const openRemoveItemModal = (itemId) => {
 }
 
 export const submitPromoCode = () => (dispatch, getState) => {
+
+    const InvalidPromoNotification = {
+        content: 'Unable to apply promo, code is invalid',
+        id: 'promoError',
+        showRemoveButton: true
+    }
+
     const PromoErrorNotification = {
         content: 'Unable to apply promo',
         id: 'promoError',
@@ -150,20 +157,25 @@ export const submitPromoCode = () => (dispatch, getState) => {
     const couponCode = getCouponValue(currentState)
     const putPromoUrl = `/rest/default/V1/${isLoggedIn ? 'carts/mine' : `guest-carts/${entityID}`}/coupons/${couponCode}`
     return makeJsonEncodedRequest(putPromoUrl, {}, {method: 'PUT'})
-        .then((response) => response.json())
+        .then((response) => {
+            if (response.status === 404) {
+                throw Error
+            }
+            return response.json()
+        })
+        .catch(() => dispatch(addNotification(InvalidPromoNotification)))
         .then(() => getCartTotalsInfo(getState))
         .then((responseJSON) => {
             const totalsInfo = {
                 subtotal_with_discount: `$${responseJSON.subtotal_with_discount.toFixed(2)}`,
                 coupon_code: responseJSON.coupon_code,
+                tax_amount: `$${responseJSON.tax_amount.toFixed(2)}`,
                 discount_amount: `-$${responseJSON.discount_amount.toFixed(2).replace('-', '')}`,
                 base_grand_total: `$${responseJSON.base_grand_total.toFixed(2)}`
             }
             dispatch(receiveCartContents(totalsInfo))
         })
-        .catch(() => {
-            dispatch(addNotification(PromoErrorNotification))
-        })
+        .catch(() => dispatch(addNotification(PromoErrorNotification)))
 }
 
 export const removePromoCode = () => (dispatch, getState) => {
@@ -184,6 +196,7 @@ export const removePromoCode = () => (dispatch, getState) => {
             const totalsInfo = {
                 subtotal_with_discount: `$${responseJSON.subtotal_with_discount.toFixed(2)}`,
                 coupon_code: responseJSON.coupon_code,
+                tax_amount: `$${responseJSON.tax_amount.toFixed(2)}`,
                 base_grand_total: `$${responseJSON.base_grand_total.toFixed(2)}`
             }
             dispatch(receiveCartContents(totalsInfo))

@@ -10,9 +10,10 @@ import Button from 'progressive-web-sdk/dist/components/button'
 import Field from 'progressive-web-sdk/dist/components/field'
 import FieldRow from 'progressive-web-sdk/dist/components/field-row'
 import ShippingMethodLabel from './shipping-method-label'
+import {fetchTaxEstimate} from '../../cart/actions'
 
 
-const ShippingMethod = ({shippingMethods}) => {
+const ShippingMethod = ({shippingMethods, fetchTaxEstimate}) => {
     return (
         <div>
             <div className="t-checkout-shipping__title u-padding-top-lg u-padding-bottom-md">
@@ -37,7 +38,7 @@ const ShippingMethod = ({shippingMethods}) => {
                 })}
 
                 <FieldRow className="u-margin-top-lg">
-                    <Button type="submit" className="c--primary u-width-full u-text-uppercase qa-checkout__continue-to-payment">
+                    <Button type="submit" onClick={fetchTaxEstimate} className="c--primary u-width-full u-text-uppercase qa-checkout__continue-to-payment">
                         Continue to Payment
                     </Button>
                 </FieldRow>
@@ -51,6 +52,7 @@ ShippingMethod.propTypes = {
     * An identifier for the current users cart
     */
     entityID: PropTypes.string,
+    fetchTaxEstimate: PropTypes.func,
     /**
     * The available shipping methods for the order
     */
@@ -71,7 +73,11 @@ const mapStateToProps = createPropsSelector({
     shippingMethods: getShippingMethods
 })
 
+const mapDispatchToProps = {
+    fetchTaxEstimate
+}
 
 export default connect(
-    mapStateToProps
+    mapStateToProps,
+    mapDispatchToProps
 )(ShippingMethod)

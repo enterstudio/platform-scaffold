@@ -20,7 +20,7 @@ const OrderTotal = ({
 }) => {
     const classes = classNames('c-order-total', className)
 
-    const totals = function() {
+    const totals = () => {
         if (discountAmount && !taxAmount) {
             return (
                 <LedgerRow
@@ -30,16 +30,7 @@ const OrderTotal = ({
                 />
             )
         }
-        if (taxAmount && !discountAmount) {
-            return (
-                <LedgerRow
-                    label="Total"
-                    isTotal={true}
-                    value={subtotalInclTax}
-                />
-            )
-        }
-        if (taxAmount && discountAmount) {
+        if ((taxAmount && discountAmount) || (taxAmount && !discountAmount)) {
             return (
                 <LedgerRow
                     label="Total"

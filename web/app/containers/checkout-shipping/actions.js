@@ -150,6 +150,12 @@ export const submitShipping = () => {
                         pathname: '/checkout/payment/'
                     })
                 }
+                const shippingTotal = {
+                    discount_amount: `$${responseJSON.totals.discount_amount.toFixed(2)}`,
+                    tax_amount: `$${responseJSON.totals.tax_amount.toFixed(2)}`,
+                    base_grand_total: `$${responseJSON.totals.base_grand_total.toFixed(2)}`
+                }
+                dispatch(receiveCheckoutData(shippingTotal))
             })
     }
 }

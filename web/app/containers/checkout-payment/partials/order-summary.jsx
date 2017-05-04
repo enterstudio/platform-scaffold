@@ -5,12 +5,12 @@ import {getAssetUrl} from 'progressive-web-sdk/dist/asset-utils'
 import throttle from 'lodash.throttle'
 import {removePromoCode} from '../../cart/actions'
 import CartPromoForm from '../../cart/partials/cart-promo-form'
-import OrderTotal from '../../../components/order-total'
+// import OrderTotal from '../../../components/order-total'
 
 // Selectors
 import * as selectors from '../selectors'
 import * as cartSelectors from '../../../store/cart/selectors'
-import {getSelectedShippingRate, getSelectedShippingLabel} from '../../../store/checkout/shipping/selectors'
+import * as shippingSelectors from '../../../store/checkout/shipping/selectors'
 
 // Actions
 import * as checkoutPaymentActions from '../actions'
@@ -65,7 +65,9 @@ class OrderSummary extends React.Component {
             isFixedPlaceOrderShown,
             summaryCount,
             subtotalExclTax,
+            grandTotal,
             subtotalInclTax,
+            subtotalWithDiscount,
             shippingRate,
             shippingLabel,
             taxAmount,
@@ -77,6 +79,35 @@ class OrderSummary extends React.Component {
                 Remove Discount
             </Button>
         )
+
+        const totals = () => {
+            if (discountAmount && !taxAmount) {
+                return (
+                    <LedgerRow
+                        label="Total"
+                        isTotal={true}
+                        value={subtotalWithDiscount}
+                    />
+                )
+            }
+            if ((taxAmount && discountAmount) || (taxAmount && !discountAmount)) {
+                return (
+                    <LedgerRow
+                        label="Total"
+                        isTotal={true}
+                        value={grandTotal}
+                    />
+                )
+            } else {
+                return (
+                    <LedgerRow
+                        label="Total"
+                        isTotal={true}
+                        value={subtotalInclTax}
+                    />
+                )
+            }
+        }
 
         return (
             <div className="t-checkout-payment__order-summary">
@@ -125,7 +156,7 @@ class OrderSummary extends React.Component {
                             </Accordion>
                         }
                     </Ledger>
-                    <OrderTotal className="u-border-light-top" />
+                    {totals()}
 
                     {/* This is the statically positioned "Place Your Order" container */}
                     <div className="u-padding-end-md u-padding-start-md">
@@ -148,7 +179,7 @@ class OrderSummary extends React.Component {
                             </Button>
 
                             <p className="u-margin-top-md">
-                                Total: <strong>{subtotalInclTax}</strong>
+                                Total: <strong>{grandTotal}</strong>
                             </p>
                         </div>
                     </div>
@@ -175,6 +206,7 @@ OrderSummary.propTypes = {
     cartItems: PropTypes.array,
     couponCode: PropTypes.string,
     discountAmount: PropTypes.string,
+    grandTotal: PropTypes.string,
 
     /**
      * Whether the fixed 'Place Order' container displays
@@ -196,11 +228,8 @@ OrderSummary.propTypes = {
      * Subtotal excluding tax
      */
     subtotalExclTax: PropTypes.string,
-
-    /**
-     * Subtotal including tax
-     */
     subtotalInclTax: PropTypes.string,
+    subtotalWithDiscount: PropTypes.string,
 
     /**
      * Total item count in cart
@@ -221,13 +250,14 @@ OrderSummary.propTypes = {
 const mapStateToProps = createPropsSelector({
     cartItems: cartSelectors.getCartItems,
     couponCode: cartSelectors.getCouponCode,
-    discountAmount: cartSelectors.getDiscountAmount,
     subtotalExclTax: cartSelectors.getSubtotalExcludingTax,
-    subtotalInclTax: cartSelectors.getSubtotalIncludingTax,
-    shippingRate: getSelectedShippingRate,
-    shippingLabel: getSelectedShippingLabel,
-    taxAmount: cartSelectors.getTaxAmount,
+    subtotalWithDiscount: cartSelectors.getSubtotalWithDiscount,
     summaryCount: cartSelectors.getCartSummaryCount,
+    taxAmount: shippingSelectors.getTaxAmount,
+    discountAmount: shippingSelectors.getDiscountAmount,
+    grandTotal: shippingSelectors.getGrandTotal,
+    shippingRate: shippingSelectors.getSelectedShippingRate,
+    shippingLabel: shippingSelectors.getSelectedShippingLabel,
     isFixedPlaceOrderShown: selectors.getIsFixedPlaceOrderShown
 })
 

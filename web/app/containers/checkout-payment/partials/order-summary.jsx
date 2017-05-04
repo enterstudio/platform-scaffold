@@ -60,6 +60,7 @@ class OrderSummary extends React.Component {
     render() {
         const {
             cartItems,
+            cartshippingRate,
             couponCode,
             discountAmount,
             isFixedPlaceOrderShown,
@@ -95,11 +96,17 @@ class OrderSummary extends React.Component {
                             label={`Subtotal (${summaryCount} items)`}
                             value={subtotalExclTax}
                         />
-
-                        <LedgerRow
-                            label={`Shipping (${shippingLabel})`}
-                            value={shippingRate}
-                        />
+                        {discountAmount ?
+                            <LedgerRow
+                                label={`Shipping (${shippingLabel})`}
+                                value={cartshippingRate}
+                            />
+                        :
+                            <LedgerRow
+                                label={`Shipping (${shippingLabel})`}
+                                value={shippingRate}
+                            />
+                        }
 
                         {taxAmount &&
                             <LedgerRow
@@ -173,6 +180,10 @@ OrderSummary.propTypes = {
      * Cart item data
      */
     cartItems: PropTypes.array,
+    /**
+     * Shipping rate calculated in cart
+     */
+    cartshippingRate: PropTypes.string,
     couponCode: PropTypes.string,
     discountAmount: PropTypes.string,
     grandTotal: PropTypes.string,
@@ -189,7 +200,7 @@ OrderSummary.propTypes = {
     shippingLabel: PropTypes.string,
 
     /**
-     * Shipping rate amount
+     * Shipping rate amount calculated in shipping step
      */
     shippingRate: PropTypes.string,
 
@@ -225,7 +236,8 @@ const mapStateToProps = createPropsSelector({
     taxAmount: cartSelectors.getTaxAmount,
     discountAmount: cartSelectors.getDiscountAmount,
     grandTotal: cartSelectors.getGrandTotal,
-    shippingRate: cartSelectors.getSelectedShippingRate,
+    cartshippingRate: cartSelectors.getSelectedShippingRate,
+    shippingRate: shippingSelectors.getSelectedShippingRate,
     shippingLabel: shippingSelectors.getSelectedShippingLabel,
     isFixedPlaceOrderShown: selectors.getIsFixedPlaceOrderShown
 })

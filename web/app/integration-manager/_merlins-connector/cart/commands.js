@@ -34,15 +34,13 @@ export const getCart = () => (dispatch) => {
     dispatch(removeNotification('cartUpdateError'))
     const currentTimeMs = new Date().getTime()
     return makeRequest(`${LOAD_CART_SECTION_URL}&_=${currentTimeMs}`, opts)
-        .then((response) => response.text())
-        .then((responseText) => {
-            const {cart} = JSON.parse(responseText)
-            const items = cart.items.map((item) => {
+        .then((response) => response.json())
+        .then(({cart}) => {
+            cart.items.forEach((item) => {
                 item.product_price = textFromFragment(item.product_price)
-                return item
             })
 
-            if (items.length > 0) {
+            if (cart.items.length > 0) {
                 dispatch(receiveCartProductData(parseCartProducts(cart)))
             }
 

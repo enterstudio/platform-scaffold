@@ -1,5 +1,5 @@
 import {browserHistory} from 'progressive-web-sdk/dist/routing'
-import {receiveProductDetailsProductData, receiveProductDetailsUIData} from '../../products/responses'
+import {receiveProductDetailsProductData, receiveProductDetailsUIData} from '../../products/results'
 import {urlToPathKey} from 'progressive-web-sdk/dist/utils/utils'
 import {makeDemandwareRequest} from '../utils'
 import {parseProductDetails, getCurrentProductID, getProductHref} from '../parsers'
@@ -25,7 +25,7 @@ export const fetchPdpData = () => (dispatch) => {
                 productDetailsMap[getProductHref(id)] = productDetailsData
             })
             dispatch(receiveProductDetailsProductData(productDetailsMap))
-            dispatch(receiveProductDetailsUIData({[productPathKey]: {itemQuantity: responseJSON.step_quantity, ctaText: 'Add To Cart'}}))
+            dispatch(receiveProductDetailsUIData({[productPathKey]: {itemQuantity: responseJSON.step_quantity}}))
         })
 }
 
@@ -36,9 +36,11 @@ export const getProductVariantData = (selections, variants, categoryIds) => (dis
 
     for (const {values, id} of variants) {
         if (categoryIds.every((id) => selections[id] === values[id])) {
-            browserHistory.push({
-                pathname: getProductHref(id)
-            })
+            setTimeout(() => {
+                browserHistory.push({
+                    pathname: getProductHref(id)
+                })
+            }, 250)
             return
         }
     }

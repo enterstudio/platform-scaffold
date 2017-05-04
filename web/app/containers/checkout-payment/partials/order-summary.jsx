@@ -77,10 +77,6 @@ class OrderSummary extends React.Component {
                 Remove Discount
             </Button>
         )
-
-        console.log('discountAmount', discountAmount)
-        console.log('couponCode', couponCode)
-
         return (
             <div className="t-checkout-payment__order-summary">
                 <div className="t-checkout-payment__title u-padding-top-lg u-padding-bottom-md">
@@ -229,7 +225,7 @@ const mapStateToProps = createPropsSelector({
     taxAmount: cartSelectors.getTaxAmount,
     discountAmount: cartSelectors.getDiscountAmount,
     grandTotal: cartSelectors.getGrandTotal,
-    shippingRate: shippingSelectors.getSelectedShippingRate,
+    shippingRate: cartSelectors.getSelectedShippingRate,
     shippingLabel: shippingSelectors.getSelectedShippingLabel,
     isFixedPlaceOrderShown: selectors.getIsFixedPlaceOrderShown
 })

@@ -172,6 +172,7 @@ export const submitPromoCode = () => (dispatch, getState) => {
                 coupon_code: responseJSON.coupon_code,
                 tax_amount: `$${responseJSON.tax_amount.toFixed(2)}`,
                 discount_amount: `-$${responseJSON.discount_amount.toFixed(2).replace('-', '')}`,
+                shipping_amount: `$${responseJSON.shipping_amount.toFixed(2)}`,
                 base_grand_total: `$${responseJSON.base_grand_total.toFixed(2)}`
             }
             dispatch(receiveCartContents(totalsInfo))
@@ -198,6 +199,7 @@ export const removePromoCode = () => (dispatch, getState) => {
                 subtotal_with_discount: `$${responseJSON.subtotal_with_discount.toFixed(2)}`,
                 coupon_code: responseJSON.coupon_code,
                 tax_amount: `$${responseJSON.tax_amount.toFixed(2)}`,
+                shipping_amount: `$${responseJSON.shipping_amount.toFixed(2)}`,
                 base_grand_total: `$${responseJSON.base_grand_total.toFixed(2)}`
             }
             dispatch(receiveCartContents(totalsInfo))

@@ -152,9 +152,7 @@ export const submitShipping = () => {
                     })
                 }
                 const shippingTotal = {
-                    discount_amount: `$${responseJSON.totals.discount_amount.toFixed(2)}`,
-                    tax_amount: `$${responseJSON.totals.tax_amount.toFixed(2)}`,
-                    base_grand_total: `$${responseJSON.totals.base_grand_total.toFixed(2)}`
+                    base_grand_total: `$${responseJSON.totals.base_grand_total.toFixed(2)}`,
                 }
                 dispatch(receiveCartContents(shippingTotal))
             })

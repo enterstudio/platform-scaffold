@@ -44,6 +44,7 @@ export const getCartTotalsInfo = (getState) => {
     const getTotalsURL = `/rest/default/V1/${isLoggedIn ? 'carts/mine' : `guest-carts/${entityID}`}/totals-information`
     return makeJsonEncodedRequest(getTotalsURL, requestData, {method: 'POST'})
         .then((response) => response.json())
+        // the above request will be handled by other actions below!
 }
 
 export const fetchTaxEstimate = () => (dispatch, getState) => {

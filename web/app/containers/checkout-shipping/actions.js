@@ -11,6 +11,7 @@ import {getCustomerEntityID} from '../../store/checkout/selectors'
 import {getIsLoggedIn} from '../app/selectors'
 import {getShippingFormValues} from '../../store/form/selectors'
 import {receiveCheckoutData} from '../../store/checkout/actions'
+import {receiveCartContents} from '../../store/cart/actions'
 
 import {makeJsonEncodedRequest} from 'progressive-web-sdk/dist/utils/fetch-utils'
 
@@ -155,7 +156,7 @@ export const submitShipping = () => {
                     tax_amount: `$${responseJSON.totals.tax_amount.toFixed(2)}`,
                     base_grand_total: `$${responseJSON.totals.base_grand_total.toFixed(2)}`
                 }
-                dispatch(receiveCheckoutData(shippingTotal))
+                dispatch(receiveCartContents(shippingTotal))
             })
     }
 }

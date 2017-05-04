@@ -5,7 +5,7 @@ import {getAssetUrl} from 'progressive-web-sdk/dist/asset-utils'
 import throttle from 'lodash.throttle'
 import {removePromoCode} from '../../cart/actions'
 import CartPromoForm from '../../cart/partials/cart-promo-form'
-// import OrderTotal from '../../../components/order-total'
+import OrderTotal from '../../../components/order-total'
 
 // Selectors
 import * as selectors from '../selectors'
@@ -66,8 +66,6 @@ class OrderSummary extends React.Component {
             summaryCount,
             subtotalExclTax,
             grandTotal,
-            subtotalInclTax,
-            subtotalWithDiscount,
             shippingRate,
             shippingLabel,
             taxAmount,
@@ -80,34 +78,8 @@ class OrderSummary extends React.Component {
             </Button>
         )
 
-        const totals = () => {
-            if (discountAmount && !taxAmount) {
-                return (
-                    <LedgerRow
-                        label="Total"
-                        isTotal={true}
-                        value={subtotalWithDiscount}
-                    />
-                )
-            }
-            if ((taxAmount && discountAmount) || (taxAmount && !discountAmount)) {
-                return (
-                    <LedgerRow
-                        label="Total"
-                        isTotal={true}
-                        value={grandTotal}
-                    />
-                )
-            } else {
-                return (
-                    <LedgerRow
-                        label="Total"
-                        isTotal={true}
-                        value={subtotalInclTax}
-                    />
-                )
-            }
-        }
+        console.log('discountAmount', discountAmount)
+        console.log('couponCode', couponCode)
 
         return (
             <div className="t-checkout-payment__order-summary">
@@ -141,22 +113,23 @@ class OrderSummary extends React.Component {
                             />
                         }
 
-                        {discountAmount && couponCode ?
+                        {discountAmount && couponCode &&
                             <LedgerRow
                                 className="pw--sale"
                                 label={`Discount: ${couponCode}`}
                                 labelAction={removeButton}
                                 value={discountAmount}
                             />
-                        :
-                            <Accordion className="u-border-bottom-0">
-                                <AccordionItem header="Promo code">
-                                    <CartPromoForm />
-                                </AccordionItem>
-                            </Accordion>
                         }
                     </Ledger>
-                    {totals()}
+                    {(!discountAmount || !couponCode) &&
+                        <Accordion>
+                            <AccordionItem header="Promo code">
+                                <CartPromoForm />
+                            </AccordionItem>
+                        </Accordion>
+                    }
+                    <OrderTotal />
 
                     {/* This is the statically positioned "Place Your Order" container */}
                     <div className="u-padding-end-md u-padding-start-md">
@@ -253,9 +226,9 @@ const mapStateToProps = createPropsSelector({
     subtotalExclTax: cartSelectors.getSubtotalExcludingTax,
     subtotalWithDiscount: cartSelectors.getSubtotalWithDiscount,
     summaryCount: cartSelectors.getCartSummaryCount,
-    taxAmount: shippingSelectors.getTaxAmount,
-    discountAmount: shippingSelectors.getDiscountAmount,
-    grandTotal: shippingSelectors.getGrandTotal,
+    taxAmount: cartSelectors.getTaxAmount,
+    discountAmount: cartSelectors.getDiscountAmount,
+    grandTotal: cartSelectors.getGrandTotal,
     shippingRate: shippingSelectors.getSelectedShippingRate,
     shippingLabel: shippingSelectors.getSelectedShippingLabel,
     isFixedPlaceOrderShown: selectors.getIsFixedPlaceOrderShown
